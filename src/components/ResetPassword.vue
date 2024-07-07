@@ -1,0 +1,142 @@
+<template>
+  <div>
+    <h1>RESET PASSWORD</h1>
+    <main class="d-flex align-items-center justify-content-center">
+      <div class="">
+        <form @submit.prevent="authStore.handleResetPw(form)">
+          <!-- * PASSWORD -->
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              placeholder="********"
+              v-model="form.password"
+              aria-describedby="passwordHelp"
+            />
+            <div
+              v-if="authStore.errors.password"
+              id="passwordHelp"
+              class="form-text"
+            >
+              <span
+                v-for="er in authStore.errors.password"
+                class="text-danger"
+                >{{ er }}</span
+              >
+            </div>
+            <div v-else id="emailHelp" class="form-text">
+              Use a strong password!
+            </div>
+          </div>
+
+          <!-- * PASSWORD CONFIRM -->
+          <div class="mb-3">
+            <label for="password" class="form-label">Password Confirm</label>
+            <input
+              type="password"
+              class="form-control"
+              id="passwordConf"
+              placeholder="********"
+              v-model="form.password_confirmation"
+              aria-describedby="passwordConfirmationHelp"
+            />
+            <div
+              v-if="form.password !== form.password_confirmation"
+              id="passwordConfirmationHelp"
+              class="form-text"
+            >
+              <span class="text-danger">passwords must be the same</span>
+            </div>
+            <div v-else id="passwordConfirmationHelpB" class="form-text">
+              <div class="d-flex">
+                <span
+                  v-if="containsBothCases(form.password)"
+                  :class="'secureRating ' + secureColor(form.password)"
+                  >Both cases &#10003;
+                </span>
+                <span
+                  v-if="containsNumbers(form.password)"
+                  :class="'secureRating ' + secureColor(form.password)"
+                  >Numbers &#10003;
+                </span>
+                <span
+                  v-if="containsSymbols(form.password)"
+                  :class="'secureRating ' + secureColor(form.password)"
+                  >Symbols &#10003;
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-warning">Reset</button>
+        </form>
+      </div>
+    </main>
+  </div>
+</template>
+
+<script setup>
+import { ref } from "vue";
+import { useAuthStore } from "../stores/auth";
+import { useRoute } from "vue-router";
+
+
+const route = useRoute()
+const authStore = useAuthStore();
+
+const form = ref({
+  password: "",
+  password_confirmation: "",
+  email: route.query.email,
+  token: route.params.token
+});
+
+let secLv = 0;
+
+function containsBothCases(str) {
+  return /[A-Z]/.test(str) && /[a-z]/.test(str);
+}
+
+function containsSymbols(str) {
+  return /[^a-zA-Z0-9]/.test(str);
+}
+
+function containsNumbers(str) {
+  return /[0-9]/.test(str);
+}
+
+function secureColor(str) {
+  let color = "";
+  let secureLevel = 0;
+
+  if (containsBothCases(str)) {
+    secureLevel++;
+  }
+  if (containsNumbers(str)) {
+    secureLevel++;
+  }
+  if (containsSymbols(str)) {
+    secureLevel++;
+  }
+  if (secureLevel == 3) {
+    color = "bg-success text-light";
+  } else if (secureLevel == 2) {
+    color = "bg-warning text-dark";
+  } else {
+    color = "bg-danger text-light";
+  }
+  return color;
+}
+</script>
+
+<style lang="scss" scoped>
+.secureRating {
+  width: calc(100% / 3);
+  border-radius: 5px;
+  text-align: center;
+  font-weight: 700;
+  margin: 5px 0;
+}
+</style>
