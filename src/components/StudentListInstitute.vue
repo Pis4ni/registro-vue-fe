@@ -38,10 +38,9 @@
 </template>
 
 <script setup>
-import axios from "axios";
 import { useAuthStore } from "../stores/auth";
 import { onMounted, ref, computed } from "vue";
-import { stringifyQuery, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -64,3 +63,9 @@ onMounted(() => {
 <style lang="scss" scoped>
 /* Il tuo stile qui */
 </style>
+
+<!-- todo CREATE-->
+<!-- todo READ-->
+<!-- todo UPDATE-->
+<!-- todo DELETE-->
+

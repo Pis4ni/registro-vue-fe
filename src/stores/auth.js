@@ -7,11 +7,16 @@ export const useAuthStore = defineStore("auth", {
     authErrors: [],
     apiErrors: [],
     studentsList: [],
+    studentObj: {},
+    instituteObj:{},
   }),
   getters: {
     user: (state) => state.authUser,
     errors: (state) => state.authErrors,
     students: (state) => state.studentsList,
+    student: (state) => state.studentObj,
+    institute: (state) => state.instituteObj,
+
   },
   actions: {
     async getToken() {
@@ -155,8 +160,6 @@ export const useAuthStore = defineStore("auth", {
     async getInstituteStudents(instituteId) {
       try {
         let url = `api/institute/${instituteId}/students`
-        console.log(url);
-        
         const response = await axios.get(url);
         console.log("Dati fetchati:", response.data);
         this.setStudentsList(response.data.students);
@@ -182,9 +185,75 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
+    async getInstituteFromId(instituteId) {
+      try {
+        let url = `api/institute/${instituteId}`
+        const response = await axios.get(url);
+        console.log("Dati fetchati:", response.data);
+        this.setInstituteObj(response.data);
+        console.log("Insstitute aggiornatio", this.instituteObj); // Corretto log
+      } catch (error) {
+        if (error.response) {
+          switch (error.response.status) {
+            case 419:
+              console.error("Non sei autorizzato, devi effettuare il login prima.");
+              break;
+            case 500:
+              console.error("Qualcosa è andato storto sul server.");
+              break;
+            default:
+              console.error("Errore durante la chiamata API:", error.response.status);
+              break;
+          }
+        } else if (error.request) {
+          console.error("Nessuna risposta ricevuta dalla chiamata API.");
+        } else {
+          console.error("Errore durante l'esecuzione della chiamata API:", error.message);
+        }
+      }
+    },
+
+    async getStudentFromId(id) {
+      try {
+        this.StudentObj = {}
+        let url = `api/students/${id}`
+        const response = await axios.get(url);
+        console.log("Dati fetchati:", response.data);
+        this.setStudentObj(response.data); // mutazione per aggiornare lo stato
+        console.log("Student aggiornato:", this.StudentObj); // Corretto log
+        if (response.data.student && response.data.student.institute_id) {
+          await this.getInstituteFromId(response.data.student.institute_id);
+        }
+      } catch (error) {
+        if (error.response) {
+          switch (error.response.status) {
+            case 419:
+              console.error("Non sei autorizzato, devi effettuare il login prima.");
+              break;
+            case 500:
+              console.error("Qualcosa è andato storto sul server.");
+              break;
+            default:
+              console.error("Errore durante la chiamata API:", error.response.status);
+              break;
+          }
+        } else if (error.request) {
+          console.error("Nessuna risposta ricevuta dalla chiamata API.");
+        } else {
+          console.error("Errore durante l'esecuzione della chiamata API:", error.message);
+        }
+      }
+    },
 
     setStudentsList(students) {
       this.studentsList = students; // Aggiorna lo stato usando una mutazione
+    },
+
+    setStudentObj(student){
+      this.studentObj = student // Aggiorna lo stato usando una mutazione
+    },
+    setInstituteObj(institute){
+      this.instituteObj = institute // Aggiorna lo stato usando una mutazione
     }
   },
 });

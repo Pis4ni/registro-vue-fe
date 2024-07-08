@@ -20,14 +20,14 @@
             <td>{{ student.class }}</td>
             <td>{{ student.section }}</td>
             <td>
-              <router-link to="">
-                <font-awesome-icon :icon="faTrash" />
+              <router-link :to="{name:'studentRead',  params: { id: student.id }}">
+                <font-awesome-icon :icon="faEye" />
               </router-link>
-              <router-link to="">
+              <router-link :to="{name:''}">
                 <font-awesome-icon :icon="faEdit" />
               </router-link>
-              <router-link to="">
-                <font-awesome-icon :icon="faEye" />
+              <router-link :to="{name:''}">
+                <font-awesome-icon :icon="faTrash" />
               </router-link>
             </td>
           </tr>
@@ -38,9 +38,9 @@
 </template>
 
 <script setup>
-import axios from "axios";
 import { useAuthStore } from "../stores/auth";
 import { onMounted, ref } from "vue";
+
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
