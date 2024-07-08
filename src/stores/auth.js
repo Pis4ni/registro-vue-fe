@@ -7,6 +7,7 @@ export const useAuthStore = defineStore("auth", {
     authErrors: [],
     apiErrors: [],
     studentsList: [],
+    institutesList: [],
     studentObj: {},
     instituteObj:{},
   }),
@@ -16,6 +17,7 @@ export const useAuthStore = defineStore("auth", {
     students: (state) => state.studentsList,
     student: (state) => state.studentObj,
     institute: (state) => state.instituteObj,
+    institutes: (state) => state.institutesList,
 
   },
   actions: {
@@ -157,6 +159,34 @@ export const useAuthStore = defineStore("auth", {
         }
       }
     },
+    
+    async getInstitutes() {
+      try {
+        const response = await axios.get("api/institute");
+        console.log("Dati fetchati:", response.data);
+        this.setInstitutesList(response.data.institutes); // Usa una mutazione per aggiornare lo stato
+        console.log("institutes aggiornati:", this.studentsList); // Corretto log
+      } catch (error) {
+        if (error.response) {
+          switch (error.response.status) {
+            case 419:
+              console.error("Non sei autorizzato, devi effettuare il login prima.");
+              break;
+            case 500:
+              console.error("Qualcosa è andato storto sul server.");
+              break;
+            default:
+              console.error("Errore durante la chiamata API:", error.response.status);
+              break;
+          }
+        } else if (error.request) {
+          console.error("Nessuna risposta ricevuta dalla chiamata API.");
+        } else {
+          console.error("Errore durante l'esecuzione della chiamata API:", error.message);
+        }
+      }
+    },
+
     async getInstituteStudents(instituteId) {
       try {
         let url = `api/institute/${instituteId}/students`
@@ -245,6 +275,64 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
+    async handleStudentCreate(data){
+      await this.getToken();
+      try {
+        await axios.post("api/students", {
+          name: data.name,
+          surname: data.surname,
+          date_of_birth: data.dob,
+          class: data.class,
+          section: data.section,
+          institute_id: data.instituteId
+        });
+        this.router.push("/students");
+        // Handle successful registration (e.g., display success message)
+      } catch (error) {
+        if (error.response.status === 422) {
+          this.authErrors = error.response.data.errors;
+        } else {
+          this.authErrors = error.response.data.errors;
+          console.error("An error occurred:", error);
+        }
+      }
+    },
+
+    async handleStudentUpdate(data,id){
+      await this.getToken();
+      try {
+        let url = `api/students/${id}`
+        await axios.put(url, {
+          name: data.name,
+          surname: data.surname,
+          date_of_birth: data.dob,
+          class: data.class,
+          section: data.section,
+          institute_id: data.instituteId
+        });
+        this.router.push("/students");
+        // Handle successful registration (e.g., display success message)
+      } catch (error) {
+        if (error.response.status === 422) {
+          this.authErrors = error.response.data.errors;
+        } else {
+          this.authErrors = error.response.data.errors;
+          console.error("An error occurred:", error);
+        }
+      }
+    },
+
+    async deleteStudent(id){
+      try {
+        await axios.delete(`/api/students/${id}`);
+        this.getStudents()
+        this.router.push("/students");
+      } catch (error) {
+        console.error("Error deleting student:", error);
+        throw error;
+      }
+    },
+    
     setStudentsList(students) {
       this.studentsList = students; // Aggiorna lo stato usando una mutazione
     },
@@ -252,8 +340,13 @@ export const useAuthStore = defineStore("auth", {
     setStudentObj(student){
       this.studentObj = student // Aggiorna lo stato usando una mutazione
     },
+
     setInstituteObj(institute){
       this.instituteObj = institute // Aggiorna lo stato usando una mutazione
-    }
+    },
+    setInstitutesList(institute){
+      this.institutesList = institute // Aggiorna lo stato usando una mutazione
+    },
+
   },
 });

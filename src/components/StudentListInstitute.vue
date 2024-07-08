@@ -1,7 +1,11 @@
 <template>
-  <h1>studentList</h1>
-
+  
   <div class="container">
+    <h1>studentList</h1>
+    <!-- <router-link to="">
+      ciao
+      <font-awesome-icon icon="plus" />
+    </router-link> -->
     <div class="table-responsive">
       <table class="table table-striped table-hover mt-3">
         <thead>
@@ -40,13 +44,13 @@
 <script setup>
 import { useAuthStore } from "../stores/auth";
 import { onMounted, ref, computed } from "vue";
-import { useRoute } from 'vue-router';
+import { useRoute } from "vue-router";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-import { faTrash, faEdit, faEye } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faEdit, faEye,} from "@fortawesome/free-solid-svg-icons";
 
-const route = useRoute()
+const route = useRoute();
 
 const instituteId = computed(() => {
   return route.params.institute_id;
@@ -68,4 +72,3 @@ onMounted(() => {
 <!-- todo READ-->
 <!-- todo UPDATE-->
 <!-- todo DELETE-->
-

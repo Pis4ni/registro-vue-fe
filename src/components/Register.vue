@@ -15,10 +15,10 @@
               v-model="form.name"
               aria-describedby="nameHelp"
             />
-            <div v-if="authStore.errors.email" id="emailHelp" class="form-text">
+            <div v-if="authStore.errors.name" id="nameHelp" class="form-text">
               <span class="text-danger">{{ authStore.errors.name[0] }}</span>
             </div>
-            <div v-else id="emailHelp" class="form-text">Insert your name</div>
+            <div v-else id="nameHelp" class="form-text">Insert your name</div>
           </div>
           <!-- * EMAIL -->
           <div class="mb-3">
